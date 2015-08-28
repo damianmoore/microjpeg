@@ -1,19 +1,20 @@
+import struct
 import StringIO
 
 from PIL import Image
 
 
-def generate_header():
+def generate_header(version=0, quality=10):
 
     sample0 = StringIO.StringIO()
     im = Image.new('RGB', (1, 1), 'white')
-    im.save(sample0, 'JPEG', quality=10)
+    im.save(sample0, 'JPEG', quality=quality)
     sample0.seek(0)
     data0 = sample0.read()
 
     sample1 = StringIO.StringIO()
     im = Image.new('RGB', (2, 2), 'black')
-    im.save(sample1, 'JPEG', quality=10)
+    im.save(sample1, 'JPEG', quality=quality)
     sample1.seek(0)
     data1 = sample1.read()
 
