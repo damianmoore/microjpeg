@@ -5,7 +5,8 @@ from PIL import Image
 
 
 def generate_header(version=0, quality=10):
-
+    # Create two in-memory JPEGs that vary in dimensions and pixel colours but
+    # have identical headers/DCT as they use the same quality parameter
     sample0 = StringIO.StringIO()
     im = Image.new('RGB', (1, 1), 'white')
     im.save(sample0, 'JPEG', quality=quality)
@@ -18,6 +19,10 @@ def generate_header(version=0, quality=10):
     sample1.seek(0)
     data1 = sample1.read()
 
+    # Walk through both files simultaneously. The byte before where we hit the
+    # first difference will be where the width and height values get set. When
+    # we hit the next difference we will have got to the end of the EXIF and
+    # DCT headers where the actual blocks start.
     header_bytes = StringIO.StringIO()
     dimension_loc = 0
 
@@ -35,12 +40,15 @@ def generate_header(version=0, quality=10):
         else:
             header_bytes.write(byte)
 
+    # We add our own header to the JPEG header which contains version number,
+    # quality used, and the byte number position where width and height need to
+    # be inserted.
+    microjpeg_header = b'microjpeg header ' + struct.pack('>H', 0)[1] + struct.pack('>H', quality)[1] + struct.pack('>H', dimension_loc)[1]
+
     header_bytes.seek(0)
     with open('headers/header.bin', 'wb') as header:
+        header.write(microjpeg_header)
         header.write(header_bytes.read())
-
-    with open('headers/header.txt', 'w') as header:
-        header.write('{}'.format(dimension_loc))
 
     bytes_out = len(open('headers/header.bin').read())
     print('Wrote header file (headers/header.bin {} bytes)'.format(bytes_out))
