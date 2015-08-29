@@ -24,6 +24,7 @@ def generate_microjpeg(path, version=0, size=48, quality=10):
     im = Image.open(path)
     im.thumbnail((width, height), Image.ANTIALIAS)
     assert(header_quality == quality)
+    height, width = im.size
     im.save(img_file, 'JPEG', quality=quality)
 
     img_file.seek(0)
