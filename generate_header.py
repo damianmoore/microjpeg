@@ -1,3 +1,4 @@
+import argparse
 import struct
 import StringIO
 
@@ -46,13 +47,19 @@ def generate_header(version=0, quality=10):
     microjpeg_header = b'microjpeg header ' + struct.pack('>H', 0)[1] + struct.pack('>H', quality)[1] + struct.pack('>H', dimension_loc)[1]
 
     header_bytes.seek(0)
-    with open('headers/header.bin', 'wb') as header:
+    fn = 'headers/header_v0_q{}.bin'.format(quality)
+    with open(fn, 'wb') as header:
         header.write(microjpeg_header)
         header.write(header_bytes.read())
 
-    bytes_out = len(open('headers/header.bin').read())
-    print('Wrote header file (headers/header.bin {} bytes)'.format(bytes_out))
+    bytes_out = len(open(fn).read())
+    print('Wrote header file ({} {} bytes)'.format(fn, bytes_out))
 
 
 if __name__ == '__main__':
-    generate_header()
+    parser = argparse.ArgumentParser(description='Generate re-usable JPEG header.')
+    parser.add_argument('-q', '--quality', type=int, help='Quality value to use for the JPEG compression. All images must have the save quality value to use the same header.')
+    args = parser.parse_args()
+
+    quality = getattr(args, 'quality') or 10
+    generate_header(quality=quality)
