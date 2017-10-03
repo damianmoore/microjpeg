@@ -4,11 +4,10 @@ import struct
 import StringIO
 
 from utils.qtables import load_qtable
-from utils.resize import pil_resize, pil_gamma_resize, pil_profiled_resize, imagemagick_resize
+from utils.resize import pil_resize, pil_profiled_resize, imagemagick_resize
 
 
 IMAGE_PROCESSOR = 'pil'
-# IMAGE_PROCESSOR = 'pil_gamma'
 # IMAGE_PROCESSOR = 'pil_profiled'
 # IMAGE_PROCESSOR = 'imagemagick'
 
@@ -21,8 +20,6 @@ def get_jpeg_data(path, qtable, size):
     img_file = StringIO.StringIO()
     if IMAGE_PROCESSOR == 'pil':
         im = pil_resize(path, size)
-    elif IMAGE_PROCESSOR == 'pil_gamma':
-        im = pil_gamma_resize(path, size)
     elif IMAGE_PROCESSOR == 'pil_profiled':
         im = pil_profiled_resize(path, size)
     elif IMAGE_PROCESSOR == 'imagemagick':
@@ -72,9 +69,9 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Generate a microjpeg based on a pre-generated, re-usable header.')
     parser.add_argument('path', help='The path of the image to read and make into a microjpeg thumbnail.')
     parser.add_argument('-s', '--size', type=int, help='Maximum width/height to use for the thumbnail size. A multiple of 8 is most efficient.')
-    parser.add_argument('-q', '--qtable', type=int, help='Quantization table to use for the JPEG compression.')
+    parser.add_argument('-q', '--qtable', type=str, help='Quantization table to use for the JPEG compression.')
     args = parser.parse_args()
 
-    size = getattr(args, 'size') or 48
+    size = getattr(args, 'size') or 32
     qtable = getattr(args, 'qtable') or None
     generate_microjpeg(args.path, qtable=qtable, size=size)

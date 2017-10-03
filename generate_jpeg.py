@@ -35,6 +35,11 @@ def generate_jpeg(path, qtable, size):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Generates full JPEG from a microjpeg.')
     parser.add_argument('path', help='The path of the microjpeg to read and expand into a full JPEG.')
+    parser.add_argument('-s', '--size', type=int, help='Maximum width/height to use for the thumbnail size. A multiple of 8 is most efficient.')
+    parser.add_argument('-q', '--qtable', type=str, help='Quantization table to use for the JPEG compression.')
     args = parser.parse_args()
 
-    generate_jpeg(args.path)
+    size = getattr(args, 'size') or 32
+    qtable = getattr(args, 'qtable') or None
+
+    generate_jpeg(args.path, qtable=qtable, size=size)
