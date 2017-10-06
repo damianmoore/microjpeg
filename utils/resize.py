@@ -1,10 +1,15 @@
+import os
 import subprocess
 
 from PIL import Image, ImageOps
-from PIL.ImageCms import profileToProfile
+from PIL.ImageCms import profileToProfile, buildTransform, applyTransform
 
 
-SRGB_PROFILE = '/usr/share/color/icc/colord/sRGB.icc'
+SRGB_PROFILE = os.path.join(os.path.dirname(__file__), '..', 'icc', 'sRGB.icc')
+LINEARIZED_PROFILE = os.path.join(os.path.dirname(__file__), '..', 'icc', 'linearized-sRGB.icc')
+
+srgb_to_linearized = buildTransform(SRGB_PROFILE, LINEARIZED_PROFILE, 'RGB', 'RGB')
+linearized_to_srgb = buildTransform(LINEARIZED_PROFILE, SRGB_PROFILE, 'RGB', 'RGB')
 
 
 def pil_resize(path, size):
@@ -15,10 +20,11 @@ def pil_resize(path, size):
 
 def pil_profiled_resize(path, size):
     im = Image.open(path)
-    # TODO: Fix this
-    # im = profileToProfile(im, SRGB_PROFILE, SRGB_PROFILE)
-    # im.convert('sRGB')
+    # im = profileToProfile(im, SRGB_PROFILE, LINEARIZED_PROFILE)
+    im = applyTransform(im, srgb_to_linearized)
     im = ImageOps.fit(im, (size, size), Image.ANTIALIAS)
+    # im = profileToProfile(im, LINEARIZED_PROFILE, SRGB_PROFILE)
+    im = applyTransform(im, linearized_to_srgb)
     return im
 
 

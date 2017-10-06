@@ -1,4 +1,3 @@
-from array import array
 import base64
 from hashlib import sha1
 import json

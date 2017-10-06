@@ -7,8 +7,8 @@ from utils.qtables import load_qtable
 from utils.resize import pil_resize, pil_profiled_resize, imagemagick_resize
 
 
-IMAGE_PROCESSOR = 'pil'
-# IMAGE_PROCESSOR = 'pil_profiled'
+# IMAGE_PROCESSOR = 'pil'
+IMAGE_PROCESSOR = 'pil_profiled'
 # IMAGE_PROCESSOR = 'imagemagick'
 
 
